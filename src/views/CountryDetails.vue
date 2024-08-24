@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useQuery } from '@vue/apollo-composable'
+import { useGraphQL } from '@/composables/useGraph'
 import countryByCode from '@/graphql/queries/countryByCode.gql'
 import DataTable from '@/components/DataTable.vue'
 import { useColumnsStore } from '@/stores/columnsStore'
@@ -9,35 +9,23 @@ import type { Country } from '@/interfaces/Country'
 
 const route = useRoute()
 const router = useRouter()
-const countryCode = ref(route.params.code)
 
 const country = ref<Country | null>(null)
-const { result, loading, error, refetch } = useQuery(
-  countryByCode,
-  { code: countryCode.value },
-  { fetchPolicy: 'network-only' }
-)
+const { executeQuery, loading, error } = useGraphQL()
 
 // Use the columns store
 const columnsStore = useColumnsStore()
 const columns = columnsStore.detailColumns
 
-watch(result, (newResult) => {
-  if (newResult && newResult.country) {
-    country.value = newResult.country
-  } else {
-    country.value = null
-  }
-})
+const fetchCountry = async (code: string) => {
+  const data = await executeQuery(countryByCode, { code })
+  country.value = data?.country || null
+}
 
-watch(
-  () => route.params.code,
-  (newCode) => {
-    countryCode.value = newCode
-    country.value = null // Reset the country data to avoid showing stale data
-    refetch({ code: newCode })
-  }
-)
+// Fetch country data on component mount
+onMounted(() => {
+  fetchCountry(route.params.code as string)
+})
 
 const goHome = () => {
   router.push({ name: 'home' })
@@ -47,7 +35,7 @@ const goHome = () => {
 <template>
   <div class="container">
     <h1 v-if="country && country.name" class="text-center my-4">{{ country.name }} details</h1>
-    <div v-if="!country" class="alert alert-warning text-center">
+    <div v-if="!country && !loading" class="alert alert-warning text-center">
       Please select a country from the home page.
     </div>
 

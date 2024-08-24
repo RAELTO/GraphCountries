@@ -30,7 +30,6 @@ const changeSearchType = (type: string) => {
   } else {
     placeHolderText.value = 'Search...'
   }
-  emit('updateSearch', { query: searchQuery.value, type: searchType.value })
 }
 </script>
 

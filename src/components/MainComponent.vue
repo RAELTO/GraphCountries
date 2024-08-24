@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue'
-import { useQuery } from '@vue/apollo-composable'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import getCountries from '@/graphql/queries/allCountries.gql'
 import SearchBar from './SearchBar.vue'
 import DataTable from './DataTable.vue'
-import { useColumnsStore } from '@/stores/columnsStore' // Import the columns store
+import { useColumnsStore } from '@/stores/columnsStore'
+import { useGraphQL } from '@/composables/useGraph'
+import getCountries from '@/graphql/queries/allCountries.gql'
 import type { Country } from '@/interfaces/Country'
 
 const searchQuery = ref('')
@@ -16,6 +16,7 @@ const columnsStore = useColumnsStore()
 const columns = columnsStore.mainColumns
 
 const countries = ref<Country[]>([])
+const { executeQuery, loading, error } = useGraphQL()
 
 const filters = computed(() => {
   let filterObject: any = {}
@@ -37,30 +38,24 @@ const filters = computed(() => {
     }
   }
 
-  return { filter: filterObject }
+  return filterObject
 })
 
-const { result, loading, refetch } = useQuery(getCountries, filters)
-
-watch(result, (newResult) => {
-  if (newResult && newResult.countries) {
-    countries.value = [...newResult.countries]
-  }
+// Fetch countries when the component mounts
+onMounted(async () => {
+  const data = await executeQuery(getCountries, { filter: filters.value })
+  countries.value = data?.countries || []
 })
 
-onMounted(() => {
-  refetch()?.then((newResult) => {
-    if (newResult.data && newResult.data.countries) {
-      countries.value = [...newResult.data.countries]
-    }
-  })
-})
-
-const handleSearchUpdate = ({ query, type }: { query: string; type: string }) => {
+// Update search and fetch countries when search criteria changes
+const handleSearchUpdate = async ({ query, type }: { query: string; type: string }) => {
   searchQuery.value = query
   searchType.value = type
+  const data = await executeQuery(getCountries, { filter: filters.value })
+  countries.value = data?.countries || []
 }
 
+// Navigate to country details page when a row is clicked
 const goToDetails = (row: Country) => {
   router.push({ name: 'details', params: { code: row.code } })
 }
@@ -100,6 +95,13 @@ const goToDetails = (row: Country) => {
         {{ row.continent.name }} ({{ row.continent.code }})
       </template>
     </DataTable>
+
+    <!-- No results found alert -->
+    <div v-if="!loading && !countries.length && !error" class="alert alert-warning text-center">
+      No records found.
+    </div>
+
+    <div v-if="error" class="alert alert-danger text-center">{{ error }}</div>
   </div>
 </template>
 
