@@ -2,12 +2,13 @@ import { mount } from '@vue/test-utils'
 import { ref } from 'vue'
 import { expect, test, vi } from 'vitest'
 import MainComponent from '../MainComponent.vue'
-import { useQuery } from '@vue/apollo-composable'
 import { createTestingPinia } from '@pinia/testing'
 import { useRouter } from 'vue-router'
+import { useGraphQL } from '@/composables/useGraph'
 
-vi.mock('@vue/apollo-composable', () => ({
-  useQuery: vi.fn()
+// Mock the `useGraphQL` composable
+vi.mock('@/composables/useGraph', () => ({
+  useGraphQL: vi.fn()
 }))
 
 vi.mock('vue-router', () => ({
@@ -15,10 +16,10 @@ vi.mock('vue-router', () => ({
 }))
 
 test('renders the component properly', () => {
-  vi.mocked(useQuery).mockReturnValue({
-    result: ref({ countries: [] }),
+  vi.mocked(useGraphQL).mockReturnValue({
+    executeQuery: vi.fn().mockResolvedValue({ countries: [] }),
     loading: ref(false),
-    refetch: vi.fn()
+    error: ref(null)
   })
 
   const wrapper = mount(MainComponent, {
@@ -31,10 +32,10 @@ test('renders the component properly', () => {
 })
 
 test('displays loading spinner when loading is true', () => {
-  vi.mocked(useQuery).mockReturnValue({
-    result: ref({ countries: [] }),
+  vi.mocked(useGraphQL).mockReturnValue({
+    executeQuery: vi.fn().mockResolvedValue({ countries: [] }),
     loading: ref(true),
-    refetch: vi.fn()
+    error: ref(null)
   })
 
   const wrapper = mount(MainComponent, {
@@ -47,10 +48,10 @@ test('displays loading spinner when loading is true', () => {
 })
 
 test('updates searchQuery and searchType when handleSearchUpdate is called', async () => {
-    vi.mocked(useQuery).mockReturnValue({
-      result: ref({ countries: [] }),
+    vi.mocked(useGraphQL).mockReturnValue({
+      executeQuery: vi.fn().mockResolvedValue({ countries: [] }),
       loading: ref(false),
-      refetch: vi.fn(),
+      error: ref(null)
     })
   
     const wrapper = mount(MainComponent, {
@@ -87,10 +88,10 @@ test('calls router.push with the correct parameters when goToDetails is called',
     languages: [{ code: 'es', name: 'Spanish', native: 'Español' }]
   }
 
-  vi.mocked(useQuery).mockReturnValue({
-    result: ref({ countries: [mockCountry] }),
+  vi.mocked(useGraphQL).mockReturnValue({
+    executeQuery: vi.fn().mockResolvedValue({ countries: [mockCountry] }),
     loading: ref(false),
-    refetch: vi.fn()
+    error: ref(null)
   })
 
   const wrapper = mount(MainComponent, {

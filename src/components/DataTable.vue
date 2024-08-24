@@ -45,7 +45,7 @@ const getFlagUrl = (countryCode: string): string => {
               <slot :name="column.slot" :row="row" :column="column" />
             </template>
             <template v-else>
-              {{ row[column.field as keyof T] }}
+              {{ row[column.field as keyof T] !== null ? row[column.field as keyof T] : 'N/A' }}
             </template>
           </td>
         </tr>

@@ -20,6 +20,7 @@ const columns = columnsStore.detailColumns
 const fetchCountry = async (code: string) => {
   const data = await executeQuery(countryByCode, { code })
   country.value = data?.country || null
+  console.log(data?.country)
 }
 
 // Fetch country data on component mount
