@@ -1,0 +1,36 @@
+query getCountries($filter: CountryFilterInput) {
+  countries(filter: $filter) {
+    awsRegion
+    capital
+    code
+    continent {
+      code
+      name
+    }
+    currencies
+    currency
+    emoji
+    emojiU
+    languages {
+      code
+      name
+      native
+      rtl
+    }
+    name
+    native
+    phone
+    phones
+    states {
+      code
+      name
+    }
+    subdivisions {
+      code
+      emoji
+      name
+    }
+  }
+}
+
+

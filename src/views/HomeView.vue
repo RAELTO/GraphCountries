@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import SearchComponent from '../components/SearchComponent.vue'
+import MainComponent from '../components/MainComponent.vue'
 </script>
 
 <template>
   <main>
-    <SearchComponent />
+    <MainComponent />
   </main>
 </template>
-
