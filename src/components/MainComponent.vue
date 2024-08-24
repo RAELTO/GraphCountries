@@ -10,44 +10,37 @@ import type { Country } from '@/interfaces/Country'
 
 const searchQuery = ref('')
 const searchType = ref('name')
+const countries = ref<Country[]>([])
 const router = useRouter()
 
 const columnsStore = useColumnsStore()
 const columns = columnsStore.mainColumns
 
-const countries = ref<Country[]>([])
 const { executeQuery, loading, error } = useGraphQL()
 
 const filters = computed(() => {
   let filterObject: any = {}
 
   if (searchQuery.value) {
+    const formattedQuery = searchQuery.value.charAt(0).toUpperCase() + searchQuery.value.slice(1)
+    
     if (searchType.value === 'name') {
-      const formattedQuery = searchQuery.value.charAt(0).toUpperCase() + searchQuery.value.slice(1)
-      filterObject = {
-        name: { regex: `${formattedQuery}` }
-      }
+      filterObject = { name: { regex: `${formattedQuery}` } }
     } else if (searchType.value === 'code') {
-      filterObject = {
-        code: { eq: searchQuery.value.toUpperCase() }
-      }
+      filterObject = { code: { eq: searchQuery.value.toUpperCase() } }
     } else if (searchType.value === 'continent') {
-      filterObject = {
-        continent: { regex: `${searchQuery.value.toUpperCase()}` }
-      }
+      filterObject = { continent: { regex: `${searchQuery.value.toUpperCase()}` } }
     }
   }
 
   return filterObject
 })
 
-// Fetch countries when the component mounts
 onMounted(async () => {
   const data = await executeQuery(getCountries, { filter: filters.value })
   countries.value = data?.countries || []
 })
 
-// Update search and fetch countries when search criteria changes
 const handleSearchUpdate = async ({ query, type }: { query: string; type: string }) => {
   searchQuery.value = query
   searchType.value = type
@@ -55,11 +48,11 @@ const handleSearchUpdate = async ({ query, type }: { query: string; type: string
   countries.value = data?.countries || []
 }
 
-// Navigate to country details page when a row is clicked
 const goToDetails = (row: Country) => {
   router.push({ name: 'details', params: { code: row.code } })
 }
 </script>
+
 
 <template>
   <div class="container">
@@ -72,9 +65,8 @@ const goToDetails = (row: Country) => {
     </div>
 
     <div v-if="loading" class="spinner-container">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+      <div class="spinner-border" role="status" />
+      <h5>Loading...</h5>
     </div>
 
     <DataTable

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useGraphQL } from '@/composables/useGraph'
 import countryByCode from '@/graphql/queries/countryByCode.gql'
@@ -13,7 +13,6 @@ const router = useRouter()
 const country = ref<Country | null>(null)
 const { executeQuery, loading, error } = useGraphQL()
 
-// Use the columns store
 const columnsStore = useColumnsStore()
 const columns = columnsStore.detailColumns
 
@@ -23,7 +22,6 @@ const fetchCountry = async (code: string) => {
   console.log(data?.country)
 }
 
-// Fetch country data on component mount
 onMounted(() => {
   fetchCountry(route.params.code as string)
 })

@@ -13,12 +13,12 @@ const emit = defineEmits<{
   (e: 'rowClick', row: T): void
 }>()
 
-const handleRowClick = (row: T) => {
-  emit('rowClick', row)
-}
-
 const getFlagUrl = (countryCode: string): string => {
   return `https://flagcdn.com/w20/${countryCode.toLowerCase()}.png`
+}
+
+const handleRowClick = (row: T) => {
+  emit('rowClick', row)
 }
 </script>
 

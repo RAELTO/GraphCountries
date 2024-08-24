@@ -4,7 +4,14 @@ import { ref, watch } from 'vue'
 const searchQuery = ref('')
 const searchType = ref('name')
 const placeHolderText = ref('Search...')
+
 const emit = defineEmits(['updateSearch'])
+
+watch(searchQuery, (newValue) => {
+  if (newValue === '') {
+    emit('updateSearch', { query: '', type: searchType.value })
+  }
+})
 
 const performSearch = (event: KeyboardEvent | MouseEvent) => {
   if ((event instanceof KeyboardEvent && event.key === 'Enter') || event instanceof MouseEvent) {
@@ -17,19 +24,11 @@ const clearSearch = () => {
   emit('updateSearch', { query: '', type: searchType.value })
 }
 
-watch(searchQuery, (newValue) => {
-  if (newValue === '') {
-    emit('updateSearch', { query: '', type: searchType.value })
-  }
-})
-
 const changeSearchType = (type: string) => {
   searchType.value = type
-  if (searchType.value === 'continent') {
-    placeHolderText.value = 'For example EU'
-  } else {
-    placeHolderText.value = 'Search...'
-  }
+  placeHolderText.value = searchType.value === 'continent'
+    ? 'For example EU'
+    : 'Search...'
 }
 </script>
 
