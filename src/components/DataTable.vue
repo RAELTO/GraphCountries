@@ -94,8 +94,8 @@ const visiblePages = computed(() => {
   </div>
 
   <!-- Pagination Controls -->
-  <nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
+  <nav aria-label="Page navigation example" class="mt-3">
+    <ul class="pagination justify-content-center flex-wrap">
       <li class="page-item" :class="{ disabled: currentPage === 1 }">
         <a
           class="page-link"
