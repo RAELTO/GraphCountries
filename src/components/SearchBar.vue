@@ -15,7 +15,13 @@ watch(searchQuery, (newValue) => {
 
 const performSearch = (event: KeyboardEvent | MouseEvent) => {
   if ((event instanceof KeyboardEvent && event.key === 'Enter') || event instanceof MouseEvent) {
-    emit('updateSearch', { query: searchQuery.value, type: searchType.value })
+    // Sanitize the input before emitting it
+    const sanitizedQuery = searchQuery.value.replace(/[^a-zA-Z0-9\s]/g, '')
+    emit('updateSearch', { query: sanitizedQuery, type: searchType.value })
+    console.log(sanitizedQuery)
+    if (sanitizedQuery.length === 0) {
+      searchQuery.value = ''
+    }
   }
 }
 
@@ -26,9 +32,7 @@ const clearSearch = () => {
 
 const changeSearchType = (type: string) => {
   searchType.value = type
-  placeHolderText.value = searchType.value === 'continent'
-    ? 'For example EU'
-    : 'Search...'
+  placeHolderText.value = searchType.value === 'continent' ? 'For example EU' : 'Search...'
 }
 </script>
 
@@ -50,6 +54,7 @@ const changeSearchType = (type: string) => {
     <input
       type="text"
       class="form-control"
+      id="search-input-main"
       :placeholder="placeHolderText"
       v-model="searchQuery"
       @keydown="performSearch"

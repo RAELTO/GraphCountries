@@ -23,7 +23,7 @@ const filters = computed(() => {
 
   if (searchQuery.value) {
     const formattedQuery = searchQuery.value.charAt(0).toUpperCase() + searchQuery.value.slice(1)
-    
+
     if (searchType.value === 'name') {
       filterObject = { name: { regex: `${formattedQuery}` } }
     } else if (searchType.value === 'code') {
@@ -52,7 +52,6 @@ const goToDetails = (row: Country) => {
   router.push({ name: 'details', params: { code: row.code } })
 }
 </script>
-
 
 <template>
   <div class="container">
